@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">&#x0A;<refactoring comment="Rename resource &apos;Wallet/apdu_scripts/test&apos; to &apos;test.scr&apos;" description="Rename resource &apos;test&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="apdu_scripts/test" name="test.scr" stamp="1617058305384" updateReferences="true"/>&#x0A;<refactoring comment="Rename resource &apos;Wallet/apdu_scripts/test.scr&apos; to &apos;testwallet.scr&apos;" description="Rename resource &apos;test.scr&apos;" flags="7" id="org.eclipse.ltk.core.refactoring.rename.resource" input="apdu_scripts/test.scr" name="testwallet.scr" stamp="1617059119268" updateReferences="true"/>
+</session>
