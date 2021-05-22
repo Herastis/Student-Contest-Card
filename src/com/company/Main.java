@@ -22,12 +22,12 @@ public class Main {
     public static String id, pin;
     public static int ML_contest, AI_contest, Python_contest, Crypto_contest, NET_contest = 0;
     public static int punctaj1 = -1, punctaj2 = -1, punctaj3 = -1, punctaj4 =-1, punctaj5 = -1;
+
     private static final String capFilePath =
             "C:\\Program Files (x86)\\Oracle\\Java Card Development Kit Simulator 3.1.0\\samples\\classic_applets\\Wallet\\applet\\apdu_scripts\\cap-Wallet.script";
 
     public static void main(String[] args) throws IOException, CadTransportException, GeneralSecurityException {
         runServer(); //run server without eclipse
-
         CadClientInterface cad;
         Socket sock;
         sock = new Socket("localhost", 9025);
@@ -103,6 +103,49 @@ public class Main {
 
         System.out.println();
 
+        create_wallet(cad);
+        select_wallet(cad);
+
+        login(); // ne logam si aflam codurile de concurs ale materiilor
+
+        info_user(); //ID, PIN, Codurile de concurs ale materiilor
+
+        concurs(id,pin,cad);
+
+
+
+
+
+
+
+
+//        // verify invalid user pin
+//        verifyInvalidUserPIN(cad);
+//        cad.exchangeApdu(apdu);
+//
+//        sc.close();
+
+        //b. Daca PIN-ul este validat, comisia alege din meniul aplicatiei Terminal, codul concursului corespunzator si introduce punctajul pe card.
+//        choose_code(cad);
+//        cad.exchangeApdu(apdu);
+
+        cad.powerDown(true);
+    }
+
+
+
+    public static void info_user()
+    {
+        System.out.println("ID student logat: " + id);
+        System.out.println("PIN student logat: " + pin);
+        System.out.println("ML cod de concurs: " + ML_contest);
+        System.out.println("AI cod de concurs: " + AI_contest);
+        System.out.println("Python cod de concurs: " + Python_contest);
+        System.out.println("Crypto cod de concurs: " + Crypto_contest);
+        System.out.println(".NET cod de concurs: " + NET_contest);
+        System.out.println();
+    }
+    private static void create_wallet(CadClientInterface cad) throws IOException, CadTransportException {
         // create wallet
         Apdu apdu = new Apdu();
         apdu.command = new byte[]{(byte) 0x80, (byte) 0xB8, 0x00, 0x00};
@@ -113,8 +156,11 @@ public class Main {
         System.out.println(apdu);
         System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
         System.out.println();
+    }
 
+    private static void select_wallet(CadClientInterface cad) throws IOException, CadTransportException {
         // select wallet
+        Apdu apdu = new Apdu();
         apdu = new Apdu();
         apdu.command = new byte[]{0x00, (byte) 0xA4, 0x04, 0x00};
         apdu.setDataIn(new byte[]{(byte) 0xa0, 0x0, 0x0, 0x0, 0x62, 0x3, 0x1, 0xc, 0x6, 0x1});
@@ -124,33 +170,21 @@ public class Main {
         System.out.println(apdu);
         System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
         System.out.println();
+    }
 
-        // LOGIN STUDENT
-        Scanner sc = new Scanner(System.in);
-        System.out.print("Ești un student? (da/nu)\n");
-        System.out.print("R: ");
-        String ans = sc.nextLine();
-        //System.out.print(ans);
+    private static void comisie(String id,String pin, CadClientInterface cad) throws IOException, CadTransportException{
+        // a. Din aplicatia Terminal studentul introduce PIN-ul care este trimis la Java Card Applet pentru validare
+        // verify user pin
+        verifyUserPIN(cad);
+    }
 
-        if(ans.equals("da")) //daca avem un student, ne logam
-            login();
-
-        System.out.println("ID student logat: " + id);
-        System.out.println("PIN student logat: " + pin);
-
-        System.out.println("ML code contest: " + ML_contest);
-        System.out.println("AI code contest: " + AI_contest);
-        System.out.println("Python code contest: " + Python_contest);
-        System.out.println("Crypto code contest: " + Crypto_contest);
-        System.out.println(".NET code contest: " + NET_contest);
-
-        System.out.println();
-
+    private static void concurs(String id,String pin, CadClientInterface cad) throws IOException, CadTransportException{
         while(true) // Participarea la concurs
         {
+            Scanner sc = new Scanner(System.in);
             System.out.print("La ce concursuri vrei să participi? \n 1)ML (R:1) \n 2)AI (R:2) \n 3)Python (R:3) \n 4)Crypto (R:4) \n 5).NET (R:5) \n 6)Nu particip/mai particip la nimic. (R:6)\n");
             System.out.print("R: ");
-            ans = sc.nextLine();
+            String ans = sc.nextLine();
             //System.out.println(ans);
             if(ans.equals("1"))
                 if(punctaj1 == -1)
@@ -172,39 +206,15 @@ public class Main {
                 if(punctaj5 == -1)
                     punctaj5 = contest5(); //.NET contest
                 else System.out.println("Ai participat deja la concursul acesta!");
-            if(ans.equals("6"))
+            if(ans.equals("6")) {
+                System.out.println("ML punctaj obținut la concurs: " + punctaj1);
+                System.out.println("AI punctaj obținut la concurs: " + punctaj2);
+                System.out.println("Python punctaj obținut la concurs: " + punctaj3);
+                System.out.println("Crypto punctaj obținut la concurs: " + punctaj4);
+                System.out.println(".NET punctaj obținut la concurs: " + punctaj5);
                 break;
+            }
         }
-
-        System.out.println("ML contest: " + punctaj1);
-        System.out.println("AI contest: " + punctaj2);
-        System.out.println("Python contest: " + punctaj3);
-        System.out.println("Crypto contest: " + punctaj4);
-        System.out.println(".NET contest: " + punctaj5);
-
-        comisie(id,pin,cad);
-
-
-
-
-//        // verify invalid user pin
-//        verifyInvalidUserPIN(cad);
-//        cad.exchangeApdu(apdu);
-//
-//        sc.close();
-
-        //b. Daca PIN-ul este validat, comisia alege din meniul aplicatiei Terminal, codul concursului corespunzator si introduce punctajul pe card.
-//        choose_code(cad);
-//        cad.exchangeApdu(apdu);
-
-        cad.powerDown(true);
-    }
-
-    private static void comisie(String id,String pin, CadClientInterface cad) throws IOException, CadTransportException{
-        // a. Din aplicatia Terminal studentul introduce PIN-ul care este trimis la Java Card Applet pentru validare
-        // verify user pin
-        verifyUserPIN(cad);
-
     }
 
     public static int contest1(){
