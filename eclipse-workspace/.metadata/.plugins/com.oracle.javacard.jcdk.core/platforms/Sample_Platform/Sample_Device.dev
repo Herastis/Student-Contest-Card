@@ -1,5 +1,5 @@
 #Sample_Device
-#Sat May 22 21:53:21 EEST 2021
+#Sun May 23 15:35:36 EEST 2021
 b=false
 e=false
 apdu_mi=false
@@ -17,7 +17,7 @@ port=9025
 nobanner=false
 output_filename=
 proxy2ide_port=7020
-no_apdu_console=false
+no_apdu_console=true
 z=false
 apdu_d=false
 nomeminfo=false

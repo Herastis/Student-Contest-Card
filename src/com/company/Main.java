@@ -22,6 +22,7 @@ public class Main {
     public static String id, pin;
     public static int ML_contest, AI_contest, Python_contest, Crypto_contest, NET_contest = 0;
     public static int punctaj1 = -1, punctaj2 = -1, punctaj3 = -1, punctaj4 =-1, punctaj5 = -1;
+    public static String[] bd = {};
 
     private static final String capFilePath =
             "C:\\Program Files (x86)\\Oracle\\Java Card Development Kit Simulator 3.1.0\\samples\\classic_applets\\Wallet\\applet\\apdu_scripts\\cap-Wallet.script";
@@ -106,28 +107,47 @@ public class Main {
         create_wallet(cad);
         select_wallet(cad);
 
+        // get_balance
+        Apdu apdu = new Apdu();
+        apdu.command = new byte[]{(byte) 0x80, (byte) 0x50, 0x00, 0x00};
+        cad.exchangeApdu(apdu);
+
+
+        System.out.println(apdu);
+        System.out.println("GET BALANCE");
+        System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
+        System.out.println();
+
+
+        String info = apdu.toString();
+        System.out.println("Info:" + info);
+
+
+        int start_index = info.indexOf("Le: ");
+        String l = info.substring(start_index + 4, start_index + 20);
+        String[] splits = l.split(", ");
+        String byte1=Arrays.asList(splits).get(0);
+        String byte2=Arrays.asList(splits).get(1);
+        String byte3=Arrays.asList(splits).get(2);
+        String byte4=Arrays.asList(splits).get(3);
+
+        System.out.println(byte1);
+        System.out.println(byte2);
+        System.out.println(byte3);
+        System.out.println(byte4);
+
+
         login(); // ne logam si aflam codurile de concurs ale materiilor
 
         info_user(); //ID, PIN, Codurile de concurs ale materiilor
 
-        concurs(id,pin,cad);
 
 
 
 
+        comisie(id,pin,cad);
 
-
-
-
-//        // verify invalid user pin
-//        verifyInvalidUserPIN(cad);
-//        cad.exchangeApdu(apdu);
-//
-//        sc.close();
-
-        //b. Daca PIN-ul este validat, comisia alege din meniul aplicatiei Terminal, codul concursului corespunzator si introduce punctajul pe card.
-//        choose_code(cad);
-//        cad.exchangeApdu(apdu);
+        //profesor(id, pin, cad);
 
         cad.powerDown(true);
     }
@@ -172,39 +192,58 @@ public class Main {
         System.out.println();
     }
 
-    private static void comisie(String id,String pin, CadClientInterface cad) throws IOException, CadTransportException{
-        // a. Din aplicatia Terminal studentul introduce PIN-ul care este trimis la Java Card Applet pentru validare
-        // verify user pin
-        verifyUserPIN(cad);
-    }
+//    private static void profesor(String id,String pin, CadClientInterface cad) throws IOException, CadTransportException {
+//        if(!verifyUserPIN(cad)) {
+//            System.out.println("Pin invalid");
+//            break;
+//        }
+//
+//
+//    }
 
-    private static void concurs(String id,String pin, CadClientInterface cad) throws IOException, CadTransportException{
+    byte[] UPDATE_DATA = {
+            (byte) 0x80, (byte) 0x30, (byte) 0x00, (byte) 0x00,
+            (byte) 0x07, // LC
+            (byte) 0xFA, (byte) 0x62, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x00, (byte) 0x7F
+            //ID_discipl  nota         data   zi          luna         an    id concurs     punctaj concurs
+    };
+
+    private static void comisie(String id,String pin, CadClientInterface cad) throws IOException, CadTransportException{
         while(true) // Participarea la concurs
         {
+            if(!verifyUserPIN(cad)) {
+                System.out.println("Pin invalid");
+                break;
+            }
             Scanner sc = new Scanner(System.in);
             System.out.print("La ce concursuri vrei să participi? \n 1)ML (R:1) \n 2)AI (R:2) \n 3)Python (R:3) \n 4)Crypto (R:4) \n 5).NET (R:5) \n 6)Nu particip/mai particip la nimic. (R:6)\n");
             System.out.print("R: ");
             String ans = sc.nextLine();
             //System.out.println(ans);
             if(ans.equals("1"))
-                if(punctaj1 == -1)
+                if(punctaj1 == -1) {
                     punctaj1 = contest1(); //ML contest
+                }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("2"))
-                if(punctaj2 == -1)
+                if(punctaj2 == -1) {
                     punctaj2 = contest2(); //AI contest
+                }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("3"))
-                if(punctaj3 == -1)
+                if(punctaj3 == -1) {
                     punctaj3 = contest3(); //Python contest
+                }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("4"))
-                if(punctaj4 == -1)
+                if(punctaj4 == -1) {
                     punctaj4 = contest4(); //Crypto contest
+                }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("5"))
-                if(punctaj5 == -1)
+                if(punctaj5 == -1) {
                     punctaj5 = contest5(); //.NET contest
+                }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("6")) {
                 System.out.println("ML punctaj obținut la concurs: " + punctaj1);
@@ -271,19 +310,19 @@ public class Main {
         //sc.close();  //closes the scanner
         //save in Terminal data for specific student
 
-        String[] arr = {};
+
         //parsing a CSV file into Scanner class constructor
         try (Scanner csv = new Scanner(new File("Studenti.csv"))) {
             csv.useDelimiter(",|\\r\\n");  //sets the delimiter pattern
             while (csv.hasNext())  //returns a boolean value
             {
                 //System.out.print(csv.next());
-                arr = Arrays.copyOf(arr, arr.length + 1);
-                arr[arr.length - 1] = csv.next();
+                bd = Arrays.copyOf(bd, bd.length + 1);
+                bd[bd.length - 1] = csv.next();
                 //System.out.println(); //find and returns the next complete token from this scanner
             }
 
-            //System.out.println("elementul 7: " + arr[16]);
+            //System.out.println("elementul 7: " + bd[16]);
             csv.close();  //closes the scanner
         } catch (FileNotFoundException e) {
             e.printStackTrace();
@@ -291,26 +330,26 @@ public class Main {
 
         //Parcurg vectorul de date, caut studentul si codurile materiilor
         String pathToCsv = "F:\\Github\\Student-Contest-Card\\Studenti.csv";
-        for(int i = 0; i< arr.length; i++)
-            //System.out.println("arr[" + i + "]: " + arr[i] + " ");
-            if(arr[i].equals(id))
-                if(arr[i+1].equals(pin))
+        for(int i = 0; i< bd.length; i++)
+            //System.out.println("bd[" + i + "]: " + bd[i] + " ");
+            if(bd[i].equals(id))
+                if(bd[i+1].equals(pin))
                 {
-                    //int ML_mark = Integer.parseInt(arr[i+5]);
-                    ML_contest = Integer.parseInt(arr[i+7]);
+                    //int ML_mark = Integer.parseInt(bd[i+5]);
+                    ML_contest = Integer.parseInt(bd[i+7]);
                     //System.out.println(ML_contest);
-                    AI_contest = Integer.parseInt(arr[i+16]);
+                    AI_contest = Integer.parseInt(bd[i+16]);
                     //System.out.println(AI_contest);
-                    Python_contest = Integer.parseInt(arr[i+25]);
+                    Python_contest = Integer.parseInt(bd[i+25]);
                     //System.out.println(Python_contest);
-                    Crypto_contest = Integer.parseInt(arr[i+34]);
+                    Crypto_contest = Integer.parseInt(bd[i+34]);
                     //System.out.println(Crypto_contest);
-                    NET_contest = Integer.parseInt(arr[i+43]);
+                    NET_contest = Integer.parseInt(bd[i+43]);
                     //System.out.println(NET_contest);
                     break;
                 }
-             else
-                System.out.println("ID sau PIN gresit");
+                else
+                    System.out.println("ID sau PIN gresit");
     }
 
 
@@ -325,7 +364,8 @@ public class Main {
     }
 
 
-    private static void verifyUserPIN(CadClientInterface cad) throws IOException, CadTransportException {
+    private static boolean verifyUserPIN(CadClientInterface cad) throws IOException, CadTransportException {
+        boolean verify = false;
         Apdu apdu;// verify PIN
         apdu = new Apdu();
         apdu.command = new byte[]{(byte) 0x80, (byte) 0x20, 0x00, 0x00};
@@ -338,6 +378,9 @@ public class Main {
         System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
         //System.out.println(apdu.getSw1Sw2());
         System.out.println();
+        if(byteToHexByte(apdu.getSw1Sw2()[0]).equals("0x90") && byteToHexByte(apdu.getSw1Sw2()[1]).equals("0x00"))
+            verify = true;
+        return verify;
     }
 
     private static void verifyInvalidUserPIN(CadClientInterface cad) throws IOException, CadTransportException {
