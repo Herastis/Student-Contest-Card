@@ -112,7 +112,7 @@ public class Main {
         login();                   // ne logam si aflam codurile de concurs ale materiilor
         useCases(id, pin, cad);    //in subprogramul comisie organizez si concursurile
         secretariat(cad);
-
+        createCSV();
         cad.powerDown(true);
     }
 
@@ -225,9 +225,9 @@ public class Main {
             csvReader.close();
 
 
-//        for(int i=0; i< arrayForCsv.length; ++i)
-//            System.out.println("Array: " + arrayForCsv[i]);
-        createCSV();
+        for(int i=0; i< arrayForCsv.length; ++i)
+            System.out.println("Array: " + arrayForCsv[i]);
+
         System.out.println("Punctaj:" + punctaj);
 
 
@@ -536,21 +536,31 @@ public class Main {
         return escapedData;
     }
 
-    public static void createCSV(){
-        try {
-            PrintWriter pw= new PrintWriter(new File("F:\\Github\\Student-Contest-Card\\Studenti1.csv"));
-            StringBuilder sb=new StringBuilder();
-            for(int i = 0; i<= arrayForCsv.length; ++i)
-                if(i%8 == 0)
-                    sb.append(arrayForCsv[i] + "," + "\r\n");
-                else
-                    sb.append(arrayForCsv[i]);
-            pw.write(sb.toString());
-            pw.close();
-            System.out.println("finished");
-        } catch (Exception e) {
-            // TODO: handle exception
+    public static void createCSV() throws IOException{
+//        try {
+//            PrintWriter pw= new PrintWriter(new File("F:\\Github\\Student-Contest-Card\\Studenti1.csv"));
+//            StringBuilder sb=new StringBuilder();
+//            String nuj = arrayForCsv[0];
+//            System.out.println(nuj);
+//            sb.append(nuj);
+//            pw.write(sb.toString());
+//            pw.close();
+//            System.out.println("finished");
+//        } catch (Exception e) {
+//            // TODO: handle exception
+//        }
+        BufferedWriter br = new BufferedWriter(new FileWriter("F:\\Github\\Student-Contest-Card\\altceva.csv"));
+        StringBuilder sb = new StringBuilder();
+
+        // Append strings from array
+        for (String element : arrayForCsv) {
+            System.out.println("Element: " + element);
+            sb.append(element);
+            sb.append(",");
         }
+
+        br.write(sb.toString());
+        br.close();
     }
 
 
