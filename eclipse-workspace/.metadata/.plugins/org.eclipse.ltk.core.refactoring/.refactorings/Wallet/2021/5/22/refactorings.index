@@ -1,0 +1,6 @@
+1621786085170	Rename field 'GET_BALANCE'
+1621786116740	Rename field 'STUDENT_INFO'
+1621786140623	Rename method 'getBalance'
+1621786152983	Rename method 'getStudentInfo'
+1621817355730	Rename field 'CREDIT'
+1621817389099	Rename method 'credit'

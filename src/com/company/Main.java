@@ -4,6 +4,7 @@ import com.sun.javacard.apduio.CadClientInterface;
 import com.sun.javacard.apduio.CadDevice;
 import com.sun.javacard.apduio.CadTransportException;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.Random;
 
@@ -22,6 +23,7 @@ public class Main {
     public static String id, pin;
     public static int ML_contest, AI_contest, Python_contest, Crypto_contest, NET_contest = 0;
     public static int punctaj1 = -1, punctaj2 = -1, punctaj3 = -1, punctaj4 =-1, punctaj5 = -1;
+    public static int ML = 11, AI = 21, Python = 31, Crypto = 41, NET = 51;
     public static String[] bd = {};
 
     private static final String capFilePath =
@@ -36,7 +38,6 @@ public class Main {
         OutputStream os = sock.getOutputStream();
         cad = CadDevice.getCadClientInstance(CadDevice.PROTOCOL_T1, is, os);
         cad.powerUp();
-
 
         // Parse the CAP file
         try(Stream<String> stream = Files.lines(Paths.get(capFilePath))) {
@@ -107,43 +108,12 @@ public class Main {
         create_wallet(cad);
         select_wallet(cad);
 
-        // get_balance
-        Apdu apdu = new Apdu();
-        apdu.command = new byte[]{(byte) 0x80, (byte) 0x50, 0x00, 0x00};
-        cad.exchangeApdu(apdu);
-
-
-        System.out.println(apdu);
-        System.out.println("GET BALANCE");
-        System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
-        System.out.println();
-
-
-        String info = apdu.toString();
-        System.out.println("Info:" + info);
-
-
-        int start_index = info.indexOf("Le: ");
-        String l = info.substring(start_index + 4, start_index + 20);
-        String[] splits = l.split(", ");
-        String byte1=Arrays.asList(splits).get(0);
-        String byte2=Arrays.asList(splits).get(1);
-        String byte3=Arrays.asList(splits).get(2);
-        String byte4=Arrays.asList(splits).get(3);
-
-        System.out.println(byte1);
-        System.out.println(byte2);
-        System.out.println(byte3);
-        System.out.println(byte4);
-
+        // Show Students info GET BALANCE
+        //getStudentsInfo(cad);
 
         login(); // ne logam si aflam codurile de concurs ale materiilor
 
-        info_user(); //ID, PIN, Codurile de concurs ale materiilor
-
-
-
-
+        //info_user(); //ID, PIN, Codurile de concurs ale materiilor
 
         comisie(id,pin,cad);
 
@@ -192,14 +162,45 @@ public class Main {
         System.out.println();
     }
 
-//    private static void profesor(String id,String pin, CadClientInterface cad) throws IOException, CadTransportException {
-//        if(!verifyUserPIN(cad)) {
-//            System.out.println("Pin invalid");
-//            break;
-//        }
+    private static void profesor(CadClientInterface cad, int cod_disciplina) throws IOException, CadTransportException {
+        if(!verifyUserPIN(cad)) {
+            System.out.println("Pin invalid");
+            //break;
+        }
+        getStudentsInfo(cad, cod_disciplina);
+
+    }
+
+    private static void getStudentsInfo(CadClientInterface cad, int cod_disciplina) throws IOException, CadTransportException{
+        // Show Students info GET BALANCE
+        Apdu apdu = new Apdu();
+        apdu.command = new byte[]{(byte) 0x80, (byte) 0x50, 0x00, 0x00};
+        apdu.setDataIn(new byte[]{});
+        cad.exchangeApdu(apdu);
+
+        System.out.println(apdu);
+        System.out.println("GET BALANCE");
+        System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
+        System.out.println();
+
+        String info = apdu.toString();
+        System.out.println("Get Balance:" + info);
+
 //
+//        int start_index = info.indexOf("Le: ");
+//        String l = info.substring(start_index + 4, start_index + 20);
+//        String[] splits = l.split(", ");
+//        String byte1=Arrays.asList(splits).get(0);
+//        String byte2=Arrays.asList(splits).get(1);
+//        String byte3=Arrays.asList(splits).get(2);
+//        String byte4=Arrays.asList(splits).get(3);
 //
-//    }
+//        System.out.println(byte1);
+//        System.out.println(byte2);
+//        System.out.println(byte3);
+//        System.out.println(byte4);
+
+    }
 
     byte[] UPDATE_DATA = {
             (byte) 0x80, (byte) 0x30, (byte) 0x00, (byte) 0x00,
@@ -223,26 +224,36 @@ public class Main {
             if(ans.equals("1"))
                 if(punctaj1 == -1) {
                     punctaj1 = contest1(); //ML contest
+                    sent_contest_results(ML_contest, punctaj1, cad);
+                    profesor(cad, ML);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("2"))
                 if(punctaj2 == -1) {
                     punctaj2 = contest2(); //AI contest
+                    sent_contest_results(ML_contest, punctaj2, cad);
+                    profesor(cad, AI);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("3"))
                 if(punctaj3 == -1) {
                     punctaj3 = contest3(); //Python contest
+                    sent_contest_results(Python_contest, punctaj3, cad);
+                    profesor(cad, Python);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("4"))
                 if(punctaj4 == -1) {
                     punctaj4 = contest4(); //Crypto contest
+                    sent_contest_results(Crypto_contest, punctaj4, cad);
+                    profesor(cad, Crypto);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("5"))
                 if(punctaj5 == -1) {
                     punctaj5 = contest5(); //.NET contest
+                    sent_contest_results(NET_contest, punctaj5, cad);
+                    profesor(cad, NET);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("6")) {
@@ -251,9 +262,56 @@ public class Main {
                 System.out.println("Python punctaj obținut la concurs: " + punctaj3);
                 System.out.println("Crypto punctaj obținut la concurs: " + punctaj4);
                 System.out.println(".NET punctaj obținut la concurs: " + punctaj5);
+
                 break;
             }
         }
+    }
+    public static byte[] convertDecimalToHexadecimal(int decimalToHex) {
+        String codHexaString = (Integer.toHexString(decimalToHex));
+        byte[] codHexaByteArray = codHexaString.getBytes(StandardCharsets.UTF_8);
+        //System.out.println("Cod hexa:" + codHexaByteArray);
+        return codHexaByteArray;
+    }
+
+    private static void sent_contest_results(int cod_contest, int punctaj_concurs, CadClientInterface cad) throws IOException, CadTransportException  {
+        byte[] codHexa =  convertDecimalToHexadecimal(cod_contest);
+        byte[] punctajHexa = convertDecimalToHexadecimal(punctaj_concurs);
+
+        System.out.println();
+        System.out.println("codHexaString: " + codHexa);
+        System.out.println("punctajHexaString: " + punctajHexa);
+        System.out.println();
+
+//        //Update nota 0xFA, 0x62
+//        //0x80 0x30 0x00 0x00 0x07 0xFA 0x62 0x00 0x00 0x00 0x00 0x00 0x7F;
+//        //0xFA este codul disciplinei
+//        //0x62 este nota
+        Apdu apdu; //CREDIT
+        apdu = new Apdu();
+        apdu.command = new byte[]{(byte) 0x80, (byte) 0x30, 0x00, 0x00};
+        apdu.setDataIn(new byte[]{0x0B, 0x50});
+        cad.exchangeApdu(apdu);
+
+        System.out.println(apdu);
+        String info = apdu.toString();
+        System.out.println("CREDIT:" + info);
+
+//        int start_index = info.indexOf("Le: ");
+//        String l = info.substring(start_index + 4, start_index + 20);
+//        String[] splits = l.split(", ");
+//        String byte1=Arrays.asList(splits).get(0);
+//        String byte2=Arrays.asList(splits).get(1);
+//        String byte3=Arrays.asList(splits).get(2);
+//        String byte4=Arrays.asList(splits).get(3);
+//
+//        System.out.println(byte1);
+//        System.out.println(byte2);
+//        System.out.println(byte3);
+//        System.out.println(byte4);
+        System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
+        System.out.println();
+
     }
 
     public static int contest1(){
@@ -382,6 +440,8 @@ public class Main {
             verify = true;
         return verify;
     }
+
+
 
     private static void verifyInvalidUserPIN(CadClientInterface cad) throws IOException, CadTransportException {
         Apdu apdu;// verify PIN
