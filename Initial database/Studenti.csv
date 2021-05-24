@@ -1,4 +1,4 @@
-ID,PIN,Prioritate,Cod_disciplina,Denumire_disciplina,Nota_disciplina,Data_disciplina,Cod_concurs,Punctaj_concurs                    
+ID,PIN,Prioritate,Cod_disciplina,Denumire_disciplina,Nota_disciplina,Data_disciplina,Cod_concurs,Punctaj_concurs
 1,8206,,11,ML,6,10/1/21,1,
 1,8206,,21,AI,9,13/1/21,2,
 1,8206,,31,Python,6,8/1/21,3,

@@ -6,31 +6,31 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value="getStudents"/>
+		<item key="selection" value="get_nota_data_concurs_punctaj"/>
 		<list key="findhistory">
-			<item value="getStudents"/>
-			<item value="save"/>
-			<item value="comisie"/>
+			<item value="get_nota_data_concurs_punctaj"/>
+			<item value="profesor"/>
+			<item value="getStudentsInfo"/>
 			<item value="get"/>
-			<item value="save_contest"/>
-			<item value="credit"/>
-			<item value="Students"/>
-			<item value="buffer"/>
-			<item value="GET_BALANCE"/>
-			<item value="debit"/>
-			<item value="create"/>
-			<item value="pin"/>
-			<item value="contest"/>
+			<item value="CONTEST"/>
+			<item value="get_concursuri"/>
 			<item value="verify"/>
-			<item value="Select"/>
+			<item value="get_nota"/>
+			<item value="PROFESOR"/>
+			<item value="getStu"/>
+			<item value="save"/>
+			<item value="save_contest_mark"/>
+			<item value="comisie"/>
+			<item value="getStudents"/>
+			<item value="save_contest"/>
 		</list>
 		<list key="replacehistory">
 			<item value=""/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">
-		<item key="DIALOG_X_ORIGIN" value="847"/>
-		<item key="DIALOG_Y_ORIGIN" value="227"/>
+		<item key="DIALOG_X_ORIGIN" value="605"/>
+		<item key="DIALOG_Y_ORIGIN" value="310"/>
 		<item key="DIALOG_WIDTH" value="284"/>
 		<item key="DIALOG_HEIGHT" value="391"/>
 		<item key="DIALOG_FONT_NAME" value="1|Segoe UI|9.0|0|WINDOWS|1|-12|0|0|0|400|0|0|0|1|0|0|0|0|Segoe UI"/>
