@@ -6,23 +6,23 @@
 		<item key="wholeword" value="false"/>
 		<item key="incremental" value="false"/>
 		<item key="isRegEx" value="false"/>
-		<item key="selection" value="buffer"/>
+		<item key="selection" value="getStudents"/>
 		<list key="findhistory">
+			<item value="getStudents"/>
+			<item value="save"/>
+			<item value="comisie"/>
 			<item value="get"/>
+			<item value="save_contest"/>
+			<item value="credit"/>
+			<item value="Students"/>
 			<item value="buffer"/>
 			<item value="GET_BALANCE"/>
 			<item value="debit"/>
-			<item value="credit"/>
 			<item value="create"/>
 			<item value="pin"/>
 			<item value="contest"/>
 			<item value="verify"/>
 			<item value="Select"/>
-			<item value="create wallet applet"/>
-			<item value="creditAmount"/>
-			<item value="get balance"/>
-			<item value="shopId"/>
-			<item value="loyalty"/>
 		</list>
 		<list key="replacehistory">
 			<item value=""/>

@@ -4,7 +4,6 @@ import com.sun.javacard.apduio.CadClientInterface;
 import com.sun.javacard.apduio.CadDevice;
 import com.sun.javacard.apduio.CadTransportException;
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.Scanner;
 import java.util.Random;
 
@@ -167,24 +166,28 @@ public class Main {
             System.out.println("Pin invalid");
             //break;
         }
-        getStudentsInfo(cad, cod_disciplina);
+        getStudentsInfo(cad);
 
     }
 
-    private static void getStudentsInfo(CadClientInterface cad, int cod_disciplina) throws IOException, CadTransportException{
+    private static void getStudentsInfo(CadClientInterface cad) throws IOException, CadTransportException{
         // Show Students info GET BALANCE
+
+        //trebuie trimis codul disciplinei!!
+
         Apdu apdu = new Apdu();
         apdu.command = new byte[]{(byte) 0x80, (byte) 0x50, 0x00, 0x00};
-        apdu.setDataIn(new byte[]{});
+        //apdu.setDataIn(new byte[]{0x0B});
         cad.exchangeApdu(apdu);
 
         System.out.println(apdu);
-        System.out.println("GET BALANCE");
-        System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
+        //System.out.println("GET BALANCE");
+        //System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
         System.out.println();
 
         String info = apdu.toString();
         System.out.println("Get Balance:" + info);
+        System.out.println();
 
 //
 //        int start_index = info.indexOf("Le: ");
@@ -224,35 +227,35 @@ public class Main {
             if(ans.equals("1"))
                 if(punctaj1 == -1) {
                     punctaj1 = contest1(); //ML contest
-                    sent_contest_results(ML_contest, punctaj1, cad);
-                    profesor(cad, ML);
+                    save_contest_mark(ML_contest, punctaj1, cad);
+                    //profesor(cad, ML);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("2"))
                 if(punctaj2 == -1) {
                     punctaj2 = contest2(); //AI contest
-                    sent_contest_results(ML_contest, punctaj2, cad);
-                    profesor(cad, AI);
+                    save_contest_mark(ML_contest, punctaj2, cad);
+                    //profesor(cad, AI);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("3"))
                 if(punctaj3 == -1) {
                     punctaj3 = contest3(); //Python contest
-                    sent_contest_results(Python_contest, punctaj3, cad);
-                    profesor(cad, Python);
+                    save_contest_mark(Python_contest, punctaj3, cad);
+                    //profesor(cad, Python);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("4"))
                 if(punctaj4 == -1) {
                     punctaj4 = contest4(); //Crypto contest
-                    sent_contest_results(Crypto_contest, punctaj4, cad);
-                    profesor(cad, Crypto);
+                    save_contest_mark(Crypto_contest, punctaj4, cad);
+                    //profesor(cad, Crypto);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
             if(ans.equals("5"))
                 if(punctaj5 == -1) {
                     punctaj5 = contest5(); //.NET contest
-                    sent_contest_results(NET_contest, punctaj5, cad);
+                    save_contest_mark(NET_contest, punctaj5, cad);
                     profesor(cad, NET);
                 }
                 else System.out.println("Ai participat deja la concursul acesta!");
@@ -267,36 +270,32 @@ public class Main {
             }
         }
     }
-    public static byte[] convertDecimalToHexadecimal(int decimalToHex) {
-        String codHexaString = (Integer.toHexString(decimalToHex));
-        byte[] codHexaByteArray = codHexaString.getBytes(StandardCharsets.UTF_8);
-        //System.out.println("Cod hexa:" + codHexaByteArray);
-        return codHexaByteArray;
+    public static byte convertDecimalToHexadecimal(int decimalToHex) {
+        String codHexaString = Integer.toString(decimalToHex);
+        short codHexaShort = Short.valueOf(codHexaString);
+        byte codHexa = (byte) (codHexaShort & 0xff);
+
+        return codHexa;
     }
 
-    private static void sent_contest_results(int cod_contest, int punctaj_concurs, CadClientInterface cad) throws IOException, CadTransportException  {
-        byte[] codHexa =  convertDecimalToHexadecimal(cod_contest);
-        byte[] punctajHexa = convertDecimalToHexadecimal(punctaj_concurs);
+    private static void save_contest_mark(int cod_contest, int punctaj_concurs, CadClientInterface cad) throws IOException, CadTransportException  {
+        System.out.println("cod_contest: " + cod_contest);
+        System.out.println("punctaj_concurs: " + punctaj_concurs);
+
+        byte codHexa =  convertDecimalToHexadecimal(cod_contest);
+        byte punctajHexa = convertDecimalToHexadecimal(punctaj_concurs);
 
         System.out.println();
-        System.out.println("codHexaString: " + codHexa);
-        System.out.println("punctajHexaString: " + punctajHexa);
-        System.out.println();
 
-//        //Update nota 0xFA, 0x62
-//        //0x80 0x30 0x00 0x00 0x07 0xFA 0x62 0x00 0x00 0x00 0x00 0x00 0x7F;
-//        //0xFA este codul disciplinei
-//        //0x62 este nota
         Apdu apdu; //CREDIT
         apdu = new Apdu();
         apdu.command = new byte[]{(byte) 0x80, (byte) 0x30, 0x00, 0x00};
-        apdu.setDataIn(new byte[]{0x0B, 0x50});
+        apdu.setDataIn(new byte[]{codHexa, punctajHexa});
         cad.exchangeApdu(apdu);
 
         System.out.println(apdu);
         String info = apdu.toString();
-        System.out.println("CREDIT:" + info);
-
+        System.out.println("SAVE CONTEST MARK: " + info);
 //        int start_index = info.indexOf("Le: ");
 //        String l = info.substring(start_index + 4, start_index + 20);
 //        String[] splits = l.split(", ");
@@ -312,6 +311,23 @@ public class Main {
         System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
         System.out.println();
 
+        getStudentsInfo(cad);
+        info = apdu.toString();
+        System.out.println("Get Students Info: " + info);
+//        int start_index = info.indexOf("Le: ");
+//        String l = info.substring(start_index + 4, start_index + 20);
+//        String[] splits = l.split(", ");
+//        String byte1=Arrays.asList(splits).get(0);
+//        String byte2=Arrays.asList(splits).get(1);
+//        String byte3=Arrays.asList(splits).get(2);
+//        String byte4=Arrays.asList(splits).get(3);
+//
+//        System.out.println(byte1);
+//        System.out.println(byte2);
+//        System.out.println(byte3);
+//        System.out.println(byte4);
+        System.out.println("SW1: " +  byteToHexByte(apdu.getSw1Sw2()[0])+ " SW2: " +  byteToHexByte(apdu.getSw1Sw2()[1]));
+        System.out.println();
     }
 
     public static int contest1(){
