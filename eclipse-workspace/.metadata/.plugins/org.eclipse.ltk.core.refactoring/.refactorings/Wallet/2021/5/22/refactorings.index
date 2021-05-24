@@ -4,3 +4,7 @@
 1621786152983	Rename method 'getStudentInfo'
 1621817355730	Rename field 'CREDIT'
 1621817389099	Rename method 'credit'
+1621857778233	Rename field 'DEBIT'
+1621857848881	Rename method 'debit'
+1621865217585	Rename field 'RESET_PIN_TRY_COUNTER'
+1621865270675	Rename method 'resetPin'
