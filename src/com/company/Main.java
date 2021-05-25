@@ -172,6 +172,9 @@ public class Main {
         apdu.setDataIn(new byte[]{codHexa});
         cad.exchangeApdu(apdu);
 
+        System.out.println("SW1: " + byteToHexByte(apdu.getSw1Sw2()[0]) + " SW2: " + byteToHexByte(apdu.getSw1Sw2()[1]));
+        System.out.println();
+
         String info = apdu.toString();
         System.out.println("PROFESOR: " + info);
 
@@ -202,13 +205,8 @@ public class Main {
         System.out.println("Cod_concurs:" + cod_concurs);
         System.out.println("Punctaj_concurs:" + punctaj);
 
-        //if(punctaj>=80) CSV
-
-        RandomAccessFile file = new RandomAccessFile("Studenti.csv", "rw");
-
-
+        if(punctaj>=80) {
         BufferedReader csvReader = new BufferedReader(new FileReader("Studenti.csv"));
-
             String row;
             while ((row = csvReader.readLine()) != null) {
                     String[] data = row.split(",");
@@ -230,10 +228,7 @@ public class Main {
 
         System.out.println("Punctaj:" + punctaj);
 
-
-        System.out.println("SW1: " + byteToHexByte(apdu.getSw1Sw2()[0]) + " SW2: " + byteToHexByte(apdu.getSw1Sw2()[1]));
-        System.out.println();
-
+        }
 
     }
 
@@ -403,6 +398,21 @@ public class Main {
         System.out.println();
 
         getStudentsInfo(cad);
+
+//        BufferedReader csvReader = new BufferedReader(new FileReader("Studenti.csv"));
+//        String row;
+//        while ((row = csvReader.readLine()) != null) {
+//            String[] data = row.split(",");
+//            for(int i=0; i< data.length; ++i) {
+//                if (data[0].equals(id))
+//                    if (data[7].equals(String.valueOf(cod_contest))) {
+//                        data[8] = Integer.toString(punctaj_concurs);
+//                        System.out.println("Data[8]: " + data[8]);
+//                    }
+//            }
+//        }
+//        csvReader.close();
+//        createCSV();
     }
 
     public static int contest1() {
@@ -537,30 +547,21 @@ public class Main {
     }
 
     public static void createCSV() throws IOException{
-//        try {
-//            PrintWriter pw= new PrintWriter(new File("F:\\Github\\Student-Contest-Card\\Studenti1.csv"));
-//            StringBuilder sb=new StringBuilder();
-//            String nuj = arrayForCsv[0];
-//            System.out.println(nuj);
-//            sb.append(nuj);
-//            pw.write(sb.toString());
-//            pw.close();
-//            System.out.println("finished");
-//        } catch (Exception e) {
-//            // TODO: handle exception
-//        }
-        BufferedWriter br = new BufferedWriter(new FileWriter("F:\\Github\\Student-Contest-Card\\altceva.csv"));
+        BufferedWriter br = new BufferedWriter(new FileWriter("F:\\Github\\Student-Contest-Card\\Studenti1.csv"));
         StringBuilder sb = new StringBuilder();
 
         // Append strings from array
-        for (String element : arrayForCsv) {
-            System.out.println("Element: " + element);
-            sb.append(element);
+        for (int i=0; i<arrayForCsv.length; ++i) {
+            System.out.println("Element: " + arrayForCsv[i]);
+            sb.append(arrayForCsv[i]);
             sb.append(",");
+            if(i%8 == 0 && i!=0)
+                sb.append("\r\n");
         }
 
         br.write(sb.toString());
         br.close();
+
     }
 
 
